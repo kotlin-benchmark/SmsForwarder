@@ -38,8 +38,8 @@ jobs:
           languages: ${{ github.event.inputs.languages || 'java-kotlin' }}
           build-mode: manual
 
-      - name: Build (assembleDebug)
-        run: ./gradlew assembleDebug --no-daemon
+      - name: Build (compile only, packaging needs signing config)
+        run: ./gradlew compileDebugKotlin compileDebugJavaWithJavac --no-daemon
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
