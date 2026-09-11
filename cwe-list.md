@@ -141,5 +141,8 @@ step 2:
 step 3:
 [RuleLine.kt:69](E:/DefensePoint/benchmarks/kotlin-benchmark/SmsForwarder/app/src/main/kotlin/cn/ppps/forwarder/utils/RuleLine.kt#L69)
 
+step 4:
+[RuleLine.kt:71](E:/DefensePoint/benchmarks/kotlin-benchmark/SmsForwarder/app/src/main/kotlin/cn/ppps/forwarder/utils/RuleLine.kt#L71)
+
 Sink:
-[RuleLine.kt:73](E:/DefensePoint/benchmarks/kotlin-benchmark/SmsForwarder/app/src/main/kotlin/cn/ppps/forwarder/utils/RuleLine.kt#L73)
+[RuleLine.kt:74](E:/DefensePoint/benchmarks/kotlin-benchmark/SmsForwarder/app/src/main/kotlin/cn/ppps/forwarder/utils/RuleLine.kt#L74)

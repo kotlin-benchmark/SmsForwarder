@@ -68,9 +68,9 @@ class RuleLine(line: String, lineNum: Int, beforeRuleLine: RuleLine?) {
             //取最后一个条件组作为本次预览要校验的正则
             val condition = conditionGroups.last()
             return try {
+                val pattern = Pattern.compile(condition, Pattern.CASE_INSENSITIVE)
                 //CWE-1333
                 //SINK
-                val pattern = Pattern.compile(condition, Pattern.CASE_INSENSITIVE)
                 pattern.matcher(sample).find()
             } catch (e: PatternSyntaxException) {
                 logg("PatternSyntaxException: ${e.description}, Pattern: ${e.pattern}")
