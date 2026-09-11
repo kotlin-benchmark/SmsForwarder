@@ -44,6 +44,40 @@ class RuleLine(line: String, lineNum: Int, beforeRuleLine: RuleLine?) {
             }
         }
 
+        //根据规则表达式预检样本文本：拆分条件组后用正则匹配（保存规则前的自检入口）
+        fun previewCondition(expression: String, sample: String): Boolean {
+            //过长的表达式直接拒绝，避免明显的误输入
+            if (expression.length > 512) {
+                return false
+            }
+
+            //把表达式按 || 和 && 拆成若干条件组，收集其中非空的条件
+            val conditionGroups = ArrayList<String>()
+            for (orGroup in expression.split("||")) {
+                for (andGroup in orGroup.split("&&")) {
+                    val trimmed = andGroup.trim()
+                    if (trimmed.isNotEmpty()) {
+                        conditionGroups.add(trimmed)
+                    }
+                }
+            }
+            if (conditionGroups.isEmpty()) {
+                return false
+            }
+
+            //取最后一个条件组作为本次预览要校验的正则
+            val condition = conditionGroups.last()
+            return try {
+                //CWE-1333
+                //SINK
+                val pattern = Pattern.compile(condition, Pattern.CASE_INSENSITIVE)
+                pattern.matcher(sample).find()
+            } catch (e: PatternSyntaxException) {
+                logg("PatternSyntaxException: ${e.description}, Pattern: ${e.pattern}")
+                false
+            }
+        }
+
         init {
             CONJUNCTION_LIST.add("and")
             CONJUNCTION_LIST.add("or")

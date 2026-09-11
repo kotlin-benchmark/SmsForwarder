@@ -2,6 +2,7 @@ package cn.ppps.forwarder.core.webview
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
@@ -26,8 +27,12 @@ class AgentWebActivity : AppCompatActivity() {
             .haveScroll(true)
             .callBack { finish() }
             .register()
+        //CWE-79
+        //SOURCE
         val uri = intent.data
-        if (uri != null) {
+        if (uri != null && "inline" == uri.scheme) {
+            openInlineFragment(Uri.decode(uri.schemeSpecificPart))
+        } else if (uri != null) {
             XRouter.getInstance().build(uri).navigation(this, object : NavCallback() {
                 override fun onArrival(postcard: Postcard) {
                     finish()
@@ -58,6 +63,14 @@ class AgentWebActivity : AppCompatActivity() {
         ft.add(
             R.id.container_frame_layout,
             AgentWebFragment.getInstance(url).also { mAgentWebFragment = it })
+        ft.commit()
+    }
+
+    private fun openInlineFragment(html: String) {
+        val ft = supportFragmentManager.beginTransaction()
+        ft.add(
+            R.id.container_frame_layout,
+            AgentWebFragment.getInstanceInline(html).also { mAgentWebFragment = it })
         ft.commit()
     }
 

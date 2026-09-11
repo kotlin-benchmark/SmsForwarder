@@ -6,6 +6,8 @@ import cn.ppps.forwarder.utils.Log
 import androidx.core.app.ActivityCompat
 import cn.ppps.forwarder.App
 import cn.ppps.forwarder.R
+import cn.ppps.forwarder.database.AppDatabase
+import cn.ppps.forwarder.database.repository.MsgRepository
 import cn.ppps.forwarder.entity.SmsInfo
 import cn.ppps.forwarder.server.model.BaseRequest
 import cn.ppps.forwarder.server.model.SmsQueryData
@@ -57,5 +59,20 @@ class SmsController {
         val limit = smsQueryData.pageSize
         val offset = (smsQueryData.pageNum - 1) * limit
         return PhoneUtils.getSmsInfoList(smsQueryData.type, limit, offset, smsQueryData.keyword)
+    }
+
+    //查询本机已保存的转发记录（按关键字过滤内容）
+    @CrossOrigin(methods = [RequestMethod.POST])
+    @PostMapping("/records")
+    fun records(@RequestBody bean: BaseRequest<SmsQueryData>): List<String> {
+        val smsQueryData = bean.data
+        Log.d(TAG, smsQueryData.toString())
+
+        val context = XUtil.getContext()
+        //CWE-89
+        //SOURCE
+        val keyword = smsQueryData.keyword
+        val repository = MsgRepository(AppDatabase.getInstance(context).msgDao())
+        return repository.searchRecords(context, keyword)
     }
 }

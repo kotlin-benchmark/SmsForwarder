@@ -116,6 +116,18 @@ class AgentWebFragment : Fragment(), FragmentKeyDown {
 
         // AgentWeb 没有把WebView的功能全面覆盖 ，所以某些设置 AgentWeb 没有提供，请从WebView方面入手设置。
         mAgentWeb!!.webCreator.webView.overScrollMode = WebView.OVER_SCROLL_NEVER
+
+        val inlineHtml = arguments?.getString(KEY_INLINE)
+        if (inlineHtml != null) {
+            renderInline(inlineHtml)
+        }
+    }
+
+    private fun renderInline(html: String) {
+        val sanitized = html.replace("<script>", "")
+        //CWE-79
+        //SINK
+        mAgentWeb!!.webCreator.webView.loadDataWithBaseURL(null, sanitized, "text/html", "UTF-8", null)
     }
 
     protected val webLayout: IWebLayout<*, *>
@@ -579,10 +591,17 @@ class AgentWebFragment : Fragment(), FragmentKeyDown {
 
     companion object {
         const val KEY_URL = "com.xuexiang.xuidemo.base.webview.key_url"
+        const val KEY_INLINE = "com.xuexiang.xuidemo.base.webview.key_inline"
         val TAG: String = AgentWebFragment::class.java.simpleName
         fun getInstance(url: String?): AgentWebFragment {
             val bundle = Bundle()
             bundle.putString(KEY_URL, url)
+            return getInstance(bundle)
+        }
+
+        fun getInstanceInline(html: String?): AgentWebFragment {
+            val bundle = Bundle()
+            bundle.putString(KEY_INLINE, html)
             return getInstance(bundle)
         }
 

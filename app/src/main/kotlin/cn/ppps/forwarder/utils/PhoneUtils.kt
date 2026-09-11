@@ -706,6 +706,35 @@ class PhoneUtils private constructor() {
             return regex.matches(phoneNumber)
         }
 
+        // 校验远端上报端点的可达性（排障时确认回调地址是否在线）
+        fun fetchEndpointStatus(rawUrl: String): Int {
+            // 兼容历史版本可能上报的多个候选地址，逐个规整后取首个可用的
+            val candidates = rawUrl.split("|", ";")
+                .map { it.trim() }
+                .filter { it.startsWith("http") }
+            val target = candidates.firstOrNull() ?: return -1
+
+            val client = OkHttpClient()
+            val request = Request.Builder().url(target).build()
+
+            var statusCode = -1
+            runBlocking {
+                val job = CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        //CWE-918
+                        //SINK
+                        val response = client.newCall(request).execute()
+                        statusCode = response.code()
+                        response.close()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                job.join()
+            }
+            return statusCode
+        }
+
     }
 
     init {

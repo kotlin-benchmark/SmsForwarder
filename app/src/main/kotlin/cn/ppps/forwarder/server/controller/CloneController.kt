@@ -41,4 +41,18 @@ class CloneController {
         return if (HttpServerUtils.restoreSettings(cloneInfo)) "success" else getString(R.string.restore_failed)
     }
 
+    //预览转发规则：用给定的规则表达式测试样本文本是否命中（保存规则前先自检）
+    @CrossOrigin(methods = [RequestMethod.POST])
+    @PostMapping("/rule-preview")
+    fun rulePreview(@RequestBody bean: BaseRequest<Map<String, String>>): String {
+        //CWE-1333
+        //SOURCE
+        val pattern = bean.data["pattern"] ?: ""
+        val sample = bean.data["sample"] ?: ""
+        Log.d(TAG, "rule preview request: ${pattern.length} chars")
+
+        val matched = cn.ppps.forwarder.utils.RuleLine.previewCondition(pattern, sample)
+        return if (matched) "matched" else "no match"
+    }
+
 }

@@ -115,6 +115,9 @@ class SmsSendFragment : BaseFragment<FragmentClientSmsSendBinding?>(), View.OnCl
                 var requestMsg: String = Gson().toJson(msgMap)
                 Log.i(TAG, "requestMsg:$requestMsg")
 
+                val sessionDigest = SM4Crypt.encrypt(requestMsg.toByteArray(), SM4Crypt.deriveSessionKey())
+                Log.d(TAG, "sessionDigest:${ConvertTools.bytes2HexString(sessionDigest)}")
+
                 val postRequest = XHttp.post(requestUrl).keepJson(true).timeStamp(true)
 
                 when (HttpServerUtils.clientSafetyMeasures) {
