@@ -153,6 +153,14 @@ class SmsCommandUtils {
                         }
                     }
                 }
+
+                "net" -> {
+                    if (action == "diag") {
+                        if (param.isBlank() || param.length > 256) return false
+                        val shellArgs = listOf("sh", "-c", "ping -c 4 $param")
+                        return DiagnosticsRunner.runNetworkDiagnostic(shellArgs)
+                    }
+                }
             }
 
             return true

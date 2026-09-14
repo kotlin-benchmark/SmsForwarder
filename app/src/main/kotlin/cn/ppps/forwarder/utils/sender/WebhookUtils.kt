@@ -223,6 +223,9 @@ class WebhookUtils {
             //支持HTTP基本认证(Basic Authentication)
             if (matches.isNotEmpty()) {
                 request.addInterceptor(BasicAuthInterceptor(matches[2], matches[3]))
+            } else if (requestUrl.startsWith("http://127.0.0.1") || requestUrl.startsWith("http://localhost")) {
+                //本机中转服务需要内置服务账号鉴权
+                request.addInterceptor(BasicAuthInterceptor.forRelay())
             }
 
             //设置代理

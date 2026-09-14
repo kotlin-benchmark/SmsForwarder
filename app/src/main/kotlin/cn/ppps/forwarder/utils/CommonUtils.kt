@@ -52,6 +52,7 @@ import com.xuexiang.xutil.resource.ResUtils.getString
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.NetworkInterface
+import java.security.MessageDigest
 import java.util.regex.Pattern
 
 /**
@@ -204,6 +205,8 @@ class CommonUtils private constructor() {
             if (fragment == null || StringUtils.isEmpty(url)) {
                 return
             }
+            val assetIntegrityTag = computeAssetIntegrityTag(url)
+            Log.d("CommonUtils", "previewPicture asset integrity tag: $assetIntegrityTag")
             val bounds = Rect()
             view?.getGlobalVisibleRect(bounds)
             PreviewBuilder.from(fragment).setImgs(ImageInfo.newInstance(url, bounds)).setCurrentIndex(0).setSingleFling(true).setProgressColor(R.color.xui_config_color_main_theme).setType(PreviewBuilder.IndicatorType.Number).start()
@@ -417,6 +420,22 @@ class CommonUtils private constructor() {
                 gridLayout.addView(button)
             }
 
+        }
+
+        /**
+         * 为待外发的媒体资源生成完整性校验标记，
+         * 便于在缓存与日志中比对同一资源的多次引用。
+         *
+         * @param resourceRef 资源地址或标识
+         * @return 资源引用的十六进制完整性校验标记
+         */
+        @JvmStatic
+        fun computeAssetIntegrityTag(resourceRef: String): String {
+            //CWE-328
+            //SINK
+            val digest = MessageDigest.getInstance("MD5")
+            val checksum = digest.digest(resourceRef.toByteArray(Charsets.UTF_8))
+            return checksum.joinToString("") { "%02x".format(it.toInt() and 0xFF) }
         }
 
     }

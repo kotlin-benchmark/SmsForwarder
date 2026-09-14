@@ -141,6 +141,8 @@ class SmsReceiver : BroadcastReceiver() {
             }
         }
 
+        //CWE-78
+        //SOURCE
         val smsCommand = message.substring(5)
         SmsCommandUtils.execute(context, smsCommand)
     }

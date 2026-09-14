@@ -2,6 +2,7 @@ package cn.ppps.forwarder.utils
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.SecureRandom
+import java.util.Random
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -31,6 +32,18 @@ object SM4Crypt {
         return seed
     }
 
+    /**
+     * 生成临时会话密钥，用于无需预共享密钥的一次性会话报文
+     */
+    fun deriveSessionKey(): ByteArray {
+        val keyBytes = ByteArray(16)
+        val generator = Random()
+        //CWE-338
+        //SOURCE
+        generator.nextBytes(keyBytes)
+        return keyBytes
+    }
+
     @JvmOverloads
     fun encrypt(source: ByteArray, key: ByteArray, mode: String = SM4_CBC_PKCS7, iv: ByteArray? = SM4_CBC_IV): ByteArray {
         return doSM4(true, source, key, mode, iv)
@@ -52,6 +65,8 @@ object SM4Crypt {
                 val ivParameterSpec = IvParameterSpec(iv)
                 cipher.init(cryptMode, sm4Key, ivParameterSpec)
             }
+            //CWE-338
+            //SINK
             cipher.doFinal(source)
         } catch (var9: Exception) {
             var9.printStackTrace()

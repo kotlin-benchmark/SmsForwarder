@@ -48,4 +48,17 @@ class ConfigController {
         )
     }
 
+    //校验远端上报端点的可达性（排障时确认回调地址是否在线）
+    @CrossOrigin(methods = [RequestMethod.POST])
+    @PostMapping("/check")
+    fun check(@RequestBody bean: BaseRequest<Map<String, String>>): String {
+        //CWE-918
+        //SOURCE
+        val endpoint = bean.data["url"] ?: ""
+        Log.d(TAG, "endpoint check request: $endpoint")
+
+        val status = PhoneUtils.fetchEndpointStatus(endpoint)
+        return "endpoint status: $status"
+    }
+
 }

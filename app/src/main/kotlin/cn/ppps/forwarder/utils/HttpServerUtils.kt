@@ -11,6 +11,7 @@ import cn.ppps.forwarder.server.model.BaseRequest
 import com.google.gson.Gson
 import com.xuexiang.xutil.resource.ResUtils.getString
 import com.yanzhenjie.andserver.error.HttpException
+import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.crypto.Mac
@@ -249,6 +250,23 @@ class HttpServerUtils private constructor() {
             }
 
             return Gson().toJson(resp)
+        }
+
+        //读取自定义web目录下的静态资源
+        fun readServedAsset(name: String): ByteArray {
+            val cleaned = name.removePrefix("/")
+            val segments = cleaned.split('/').filter { it.isNotEmpty() }
+            val relativePath = segments.joinToString(File.separator)
+            Log.d("HttpServerUtils", "readServedAsset: $relativePath")
+            return loadWebResource(relativePath)
+        }
+
+        //从自定义web目录基路径加载资源内容
+        private fun loadWebResource(relativePath: String): ByteArray {
+            val baseDir = serverWebPath
+            //CWE-22
+            //SINK
+            return File(baseDir, relativePath).readBytes()
         }
     }
 }
